@@ -12,6 +12,8 @@
 #import "HomeModel.h"
 #import "User.h"
 
+//Next step set up network layer
+
 @interface Home (){
     HomeModel *homeModel;
 }
@@ -54,7 +56,7 @@
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     if(![homeModel hasUsers]){
-        return 2;
+        return 3;
     }else{
         return homeModel.users.count;
     }
@@ -66,8 +68,8 @@
     if([homeModel hasUsers]){
         //TODO: Add animation
     }else{
+        //get the user for this row and set up the view
         User *user = homeModel.users[indexPath.row];
-        
         [result setupWithName: user.name
                  stackProfile: user.stackProfile
                     userType : user.userType
