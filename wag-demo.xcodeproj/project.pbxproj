@@ -70,9 +70,9 @@
 		BC3B8C9320C0B3FC002C9E99 /* wag-demo */ = {
 			isa = PBXGroup;
 			children = (
-				BC3B8CAD20C0B65C002C9E99 /* Controllers */,
 				BC3B8CAC20C0B654002C9E99 /* Models */,
 				BC3B8CAB20C0B534002C9E99 /* Views */,
+				BC3B8CAD20C0B65C002C9E99 /* Controllers */,
 				BC3B8C9720C0B3FC002C9E99 /* AppDelegate.h */,
 				BC3B8C9820C0B3FC002C9E99 /* AppDelegate.m */,
 				BC3B8C9D20C0B3FC002C9E99 /* Main.storyboard */,
@@ -103,6 +103,8 @@
 		BC3B8CAC20C0B654002C9E99 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				BC3B8CD920C0DF28002C9E99 /* Constants.h */,
+				BC3B8CDA20C0DFA5002C9E99 /* Constants.m */,
 				BC3B8CDC20C0E207002C9E99 /* Home */,
 			);
 			name = Models;
@@ -137,8 +139,6 @@
 		BC3B8CDC20C0E207002C9E99 /* Home */ = {
 			isa = PBXGroup;
 			children = (
-				BC3B8CD920C0DF28002C9E99 /* Constants.h */,
-				BC3B8CDA20C0DFA5002C9E99 /* Constants.m */,
 				BC3B8CDD20C0E225002C9E99 /* HomeModel.h */,
 				BC3B8CDE20C0E232002C9E99 /* HomeModel.m */,
 				BC3B8CE020C0E890002C9E99 /* User.h */,
@@ -383,6 +383,7 @@
 				BC3B8CAA20C0B3FC002C9E99 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

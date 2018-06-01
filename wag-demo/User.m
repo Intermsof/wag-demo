@@ -15,10 +15,26 @@
 
 @implementation User
 
-- (instancetype)init{
-    return [super init];
+- (instancetype) initWithName : (NSString *) name
+                 stackProfile : (NSString *) stackProfile
+                 profileImage : (NSString *) profileImage
+                     userType : (NSString *) userType
+                         gold : (NSNumber *) gold
+                       silver : (NSNumber *) silver
+                       bronze : (NSNumber *) bronze
+                   reputation : (NSNumber *) reputation
+                       userID : (NSNumber *) userID{
+    self = [super init];
+    _name = name;
+    _stackProfile = stackProfile;
+    _userType = userType;
+    _gold = gold;
+    _silver = silver;
+    _bronze = bronze;
+    _reputation = reputation;
+    _userID = userID;
+    return self;
 };
-
 
 /*
 @synthesize name;

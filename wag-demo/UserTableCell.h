@@ -13,18 +13,27 @@
 /* UserTableCell_h */
 #import <UIkit/UIKit.h>
 
-@interface UserTableCell : UITableViewCell
+@interface UserTableCell : UITableViewCell {
+
+}
 - (instancetype)initWithStyle:(UITableViewCellStyle)style
                  reuseIdentifier:(NSString *)reuseIdentifier;
+
+//+ (UIImage *) gravatarLoadAnimation;
++ (UIImage *) goldBadge;
++ (UIImage *) silverBadge;
++ (UIImage *) bronzeBadge;
+
 
 - (void) setupWithName: (NSString *) name
           stackProfile: (NSString *) stackProfile
              userType : (NSString *) userType
-                  gold: (int) gold
-                silver: (int) silver
-                bronze: (int) bronze
-            reputation: (int) reputation;
+                 gold : (NSNumber *) gold
+               silver : (NSNumber *) silver
+               bronze : (NSNumber *) bronze
+           reputation : (NSNumber *) reputation;
 
+- (void) setupProfileImage: (UIImage *) profileImage;
 - (void) setupLocation: (NSString *) location;
 - (void) setupWebsite: (NSString *) website;
 

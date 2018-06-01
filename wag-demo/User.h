@@ -12,17 +12,31 @@
 @interface User : NSObject
 - (instancetype)init;
 
+//The Constructor takes in parameters that are guarenteed by the API to exist,
+//While optional parameters should be set manually
+- (void)setupWithName : (NSString *) name
+         stackProfile : (NSString *) stackProfile
+         profileImage : (NSString *) profileImage
+             userType : (NSString *) userType
+                 gold : (NSNumber *) gold
+               silver : (NSNumber *) silver
+               bronze : (NSNumber *) bronze
+           reputation : (NSNumber *) reputation
+               userID : (NSNumber *) userID;
 
 @property NSString *name;
 @property NSString *stackProfile;
+@property NSString *profileImage;
 @property NSString *userType;
-@property int gold;
-@property int silver;
-@property int bronze;
-@property int reputation;
+@property NSNumber *gold;
+@property NSNumber *silver;
+@property NSNumber *bronze;
+@property NSNumber *reputation;
+@property NSNumber *userID;
 
 //optionals
 @property NSString *location;
+@property NSString *website;
 
 @end
 

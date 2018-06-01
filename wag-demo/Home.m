@@ -16,6 +16,7 @@
 
 @interface Home (){
     HomeModel *homeModel;
+    UITableView *usersTable;
 }
 
 @end
@@ -33,12 +34,53 @@
     // Dispose of any resources that can be recreated.
 }
 
+//1. set up dataTaskWithURL for shared URLSession to fetch the pageNumber-th page of the stackover flow API for a list of users
+//2. parses the list of json users into instances of the User Class
+//3. Appends the instances to the *end* of the users array in homeModel
+//   Note that a consequence of this is that calling this method twice for the same pageNumber will cause undesireable behavior
+//   The correct way to call this method is to call it with pageNumber = 0, = 1, = 2, = 3, ...
+//4. Calls reloadData on the userTable in the UI Thread
+- (void)fetchAPIPage: (int) pageNumber {
+    
+    NSURL *APIurl = [NSURL URLWithString: [NSString stringWithFormat:@"%@%d%@", API_USER_BEGIN, pageNumber, API_USER_END]];
+    [NSURLSession.sharedSession dataTaskWithURL:APIurl completionHandler: ^
+     (NSData *data, NSURLResponse *response, NSError *error){
+         if(error){
+             NSLog(@"%@", [NSString stringWithFormat:@"Could not fetch page %d", pageNumber]);
+         }else{
+             NSError *jsonError;
+             NSArray *unparsedUsers = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&jsonError];
+             
+             for(NSDictionary *unparsedUser in unparsedUsers){
+                 User *user = [[User alloc] init];
+                 [user setupWithName: [unparsedUser objectForKey: KEY_FOR_NAME]
+                        stackProfile: [unparsedUser objectForKey: KEY_FOR_STACKOVERFLOW_LINK]
+                       profileImage : [unparsedUser objectForKey: KEY_FOR_PROFILE_IMAGE_LINK]
+                            userType: [unparsedUser objectForKey: KEY_FOR_USER_TYPE]
+                                gold: [unparsedUser objectForKey: KEY_FOR_GOLD]
+                              silver: [unparsedUser objectForKey: KEY_FOR_SILVER]
+                              bronze: [unparsedUser objectForKey: KEY_FOR_BRONZE]
+                          reputation: [unparsedUser objectForKey: KEY_FOR_REPUTATION]
+                             userID : [unparsedUser objectForKey: KEY_FOR_USERID]];
+                 
+                 [homeModel.users addObject: user];
+             }
+             
+             dispatch_async(dispatch_get_main_queue(), ^{
+                 [usersTable reloadData];
+             });
+         }
+     }];
+    
+}
+
 - (void) viewWillAppear:(BOOL)animated {
     homeModel = [[HomeModel alloc] init];
     
+    
     //Make the users table, register it, and add it to the view
-    UITableView *usersTable = [[UITableView alloc] initWithFrame: CGRectMake(0, 0, 0, 0) style:UITableViewStylePlain];
-    [usersTable registerClass: [UserTableCell class] forCellReuseIdentifier: USERCELLID];
+    usersTable = [[UITableView alloc] initWithFrame: CGRectMake(0, 0, 0, 0) style:UITableViewStylePlain];
+    [usersTable registerClass: [UserTableCell class] forCellReuseIdentifier: USER_CELL_ID];
     usersTable.delegate = self;
     usersTable.dataSource = self;
     [self.view addSubview: usersTable];
@@ -62,8 +104,13 @@
     }
 }
 
+- (CGFloat)tableView:(UITableView *)tableView
+heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    return  0.25 * tableView.frame.size.height;
+}
+
 - (UITableViewCell*) tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UserTableCell *result = [tableView dequeueReusableCellWithIdentifier: USERCELLID forIndexPath:indexPath];
+    UserTableCell *result = [tableView dequeueReusableCellWithIdentifier: USER_CELL_ID forIndexPath:indexPath];
     
     if([homeModel hasUsers]){
         //TODO: Add animation
@@ -75,23 +122,10 @@
                     userType : user.userType
                          gold: user.gold
                        silver: user.silver
-                       bronze:user.bronze
-                   reputation:user.reputation];
+                       bronze: user.bronze
+                   reputation: user.reputation];
     }
     
     return result;
 }
-   
-   /*)tableView:(UITableView *)tableView
-         cellForRowAtIndexPath:(NSIndexPath *)indexPath;/*
-tableView:cellForRowAtIndexPath:
-Asks the data source for a cell to insert in a particular location of the table view.
-Required.
-numberOfSectionsInTableView:
-Asks the data source to return the number of sections in the table view.
-tableView:numberOfRowsInSection:
-Tells the data source to return the number of rows in a given section of a table view.
-Required.
-*/
-
 @end

@@ -12,7 +12,7 @@
 
 @interface HomeModel : NSObject
 - (instancetype)init;
-@property NSArray *users;
+@property NSMutableArray *users;
 
 - (BOOL) hasUsers;
 

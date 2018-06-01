@@ -18,7 +18,9 @@
 @synthesize users;
 
 - (instancetype)init{
-    return [super init];
+    self = [super init];
+    self.users = [NSMutableArray array];
+    return self;
 };
 
 - (BOOL) hasUsers {
