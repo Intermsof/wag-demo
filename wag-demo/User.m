@@ -19,32 +19,29 @@
                  stackProfile : (NSString *) stackProfile
                  profileImage : (NSString *) profileImage
                      userType : (NSString *) userType
+                     location : (NSString *) location
+                      website : (NSString *) website
                          gold : (NSNumber *) gold
                        silver : (NSNumber *) silver
                        bronze : (NSNumber *) bronze
                    reputation : (NSNumber *) reputation
                        userID : (NSNumber *) userID{
     self = [super init];
+    _website = website;
+    _location = location;
     _name = name;
     _stackProfile = stackProfile;
+    _profileImage = profileImage;
     _userType = userType;
     _gold = gold;
     _silver = silver;
     _bronze = bronze;
     _reputation = reputation;
     _userID = userID;
+    _gravatar = nil;
     return self;
 };
 
-/*
-@synthesize name;
-@synthesize stackProfile;
-@synthesize userType;
-@synthesize gold;
-@synthesize silver;
-@synthesize bronze;
-@synthesize reputation;
-*/
 
 @end
 

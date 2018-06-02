@@ -23,6 +23,18 @@
 
 @implementation Home
 
+//The percentage of the entire height of the screen to use in a cell landscape mode
+static float tableRowHeightPercentage = 0.2;
+
++ (UIColor *) wagColor {
+    static UIColor *wag = nil;
+    if(wag == nil){
+        wag = [UIColor colorWithRed: 36.0/255.0 green:184.0/255.0 blue:142.0/255.0 alpha:1];
+    }
+    return wag;
+};
+
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
@@ -42,90 +54,112 @@
 //4. Calls reloadData on the userTable in the UI Thread
 - (void)fetchAPIPage: (int) pageNumber {
     
-    NSURL *APIurl = [NSURL URLWithString: [NSString stringWithFormat:@"%@%d%@", API_USER_BEGIN, pageNumber, API_USER_END]];
-    [NSURLSession.sharedSession dataTaskWithURL:APIurl completionHandler: ^
+    NSURL *APIurl = [NSURL URLWithString:@"https://api.stackexchange.com/2.2/users?site=stackoverflow"];
+    [[NSURLSession.sharedSession dataTaskWithURL:APIurl completionHandler: ^
      (NSData *data, NSURLResponse *response, NSError *error){
+         NSLog(@"In completion handler");
          if(error){
              NSLog(@"%@", [NSString stringWithFormat:@"Could not fetch page %d", pageNumber]);
          }else{
              NSError *jsonError;
-             NSArray *unparsedUsers = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&jsonError];
+             NSDictionary *unparsedUsers = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&jsonError];
              
-             for(NSDictionary *unparsedUser in unparsedUsers){
-                 User *user = [[User alloc] init];
-                 [user setupWithName: [unparsedUser objectForKey: KEY_FOR_NAME]
-                        stackProfile: [unparsedUser objectForKey: KEY_FOR_STACKOVERFLOW_LINK]
-                       profileImage : [unparsedUser objectForKey: KEY_FOR_PROFILE_IMAGE_LINK]
-                            userType: [unparsedUser objectForKey: KEY_FOR_USER_TYPE]
-                                gold: [unparsedUser objectForKey: KEY_FOR_GOLD]
-                              silver: [unparsedUser objectForKey: KEY_FOR_SILVER]
-                              bronze: [unparsedUser objectForKey: KEY_FOR_BRONZE]
-                          reputation: [unparsedUser objectForKey: KEY_FOR_REPUTATION]
-                             userID : [unparsedUser objectForKey: KEY_FOR_USERID]];
+             
+             for(NSDictionary *unparsedUser in [unparsedUsers objectForKey : KEY_FOR_ITEMS]){
+                 User *user = [[User alloc] initWithName:[unparsedUser objectForKey: KEY_FOR_NAME]
+                                            stackProfile:[unparsedUser objectForKey: KEY_FOR_STACKOVERFLOW_LINK]
+                                            profileImage:[unparsedUser objectForKey: KEY_FOR_PROFILE_IMAGE_LINK]
+                                                userType:[unparsedUser objectForKey: KEY_FOR_USER_TYPE]
+                                               location :[unparsedUser objectForKey: KEY_FOR_LOCATION]
+                                                 website:[unparsedUser objectForKey: KEY_FOR_WEBSITE]
+                                                    gold:[[unparsedUser objectForKey: KEY_FOR_BADGES] objectForKey: KEY_FOR_GOLD]
+                                                  silver:[[unparsedUser objectForKey: KEY_FOR_BADGES] objectForKey: KEY_FOR_SILVER]
+                                                  bronze:[[unparsedUser objectForKey: KEY_FOR_BADGES] objectForKey: KEY_FOR_BRONZE]
+                                              reputation:[unparsedUser objectForKey: KEY_FOR_REPUTATION]
+                                                  userID:[unparsedUser objectForKey: KEY_FOR_USERID]];
+                 
+                 NSURL *profileURL = [NSURL URLWithString: user.profileImage];
+                 //Start request for profile image
+                 [[NSURLSession.sharedSession dataTaskWithURL: profileURL completionHandler: ^
+                   (NSData *data, NSURLResponse *response, NSError *error){
+                       if(error){
+                           NSLog(@"Could not get profile image for a user");
+                       }else{
+                           UIImage *image = [UIImage imageWithData:data];
+                           user.gravatar = image;
+                        
+                           dispatch_async(dispatch_get_main_queue(), ^{
+                               [UserTableCell setImageFor: user];
+                           });
+                       }
+                   }] resume];
+                 
                  
                  [homeModel.users addObject: user];
              }
              
              dispatch_async(dispatch_get_main_queue(), ^{
                  [usersTable reloadData];
+                 NSLog(@"reloaded data");
              });
          }
-     }];
+     }] resume];
     
 }
 
 - (void) viewWillAppear:(BOOL)animated {
     homeModel = [[HomeModel alloc] init];
+    //Add a colored background for status bar
+    UIView *statusBar = [[UIView alloc] initWithFrame: CGRectMake(0, 0, self.view.frame.size.width, 20)];
     
+    statusBar.backgroundColor = Home.wagColor;
+    [self.view addSubview: statusBar];
     
     //Make the users table, register it, and add it to the view
-    usersTable = [[UITableView alloc] initWithFrame: CGRectMake(0, 0, 0, 0) style:UITableViewStylePlain];
+    usersTable = [[UITableView alloc] initWithFrame: CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height) style:UITableViewStylePlain];
     [usersTable registerClass: [UserTableCell class] forCellReuseIdentifier: USER_CELL_ID];
     usersTable.delegate = self;
     usersTable.dataSource = self;
     [self.view addSubview: usersTable];
     
-    //Setup users table constraints
-    [usersTable.leftAnchor constraintEqualToAnchor: self.view.leftAnchor];
-    [usersTable.rightAnchor constraintEqualToAnchor: self.view.rightAnchor];
-    [usersTable.bottomAnchor constraintEqualToAnchor: self.view.bottomAnchor];
-    //TODO: Change
-    [usersTable.topAnchor constraintEqualToAnchor: self.view.topAnchor];
+    usersTable.backgroundColor = Home.wagColor;
+    usersTable.translatesAutoresizingMaskIntoConstraints = false;
+    [usersTable.topAnchor constraintEqualToAnchor: statusBar.bottomAnchor].active = YES;
+    [usersTable.bottomAnchor constraintEqualToAnchor: self.view.bottomAnchor].active = YES;
+    [usersTable.leftAnchor constraintEqualToAnchor: self.view.leftAnchor].active = YES;
+    [usersTable.rightAnchor constraintEqualToAnchor: self.view.rightAnchor].active = YES;
+    
+    [self fetchAPIPage:1];
     
     
     
 }
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    if(![homeModel hasUsers]){
-        return 3;
-    }else{
-        return homeModel.users.count;
-    }
-}
+//Tableview functions
 
 - (CGFloat)tableView:(UITableView *)tableView
 heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return  0.25 * tableView.frame.size.height;
+    return tableRowHeightPercentage * tableView.frame.size.height;
 }
 
 - (UITableViewCell*) tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UserTableCell *result = [tableView dequeueReusableCellWithIdentifier: USER_CELL_ID forIndexPath:indexPath];
-    
+
     if([homeModel hasUsers]){
-        //TODO: Add animation
-    }else{
-        //get the user for this row and set up the view
         User *user = homeModel.users[indexPath.row];
-        [result setupWithName: user.name
-                 stackProfile: user.stackProfile
-                    userType : user.userType
-                         gold: user.gold
-                       silver: user.silver
-                       bronze: user.bronze
-                   reputation: user.reputation];
+        [UserTableCell notifyDisplayed:user.userID cell:result];
+        [result setupWithUser: user];
     }
-    
     return result;
 }
+
+
+- (NSInteger) tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    return homeModel.users.count;
+}
+
+-(NSInteger) numberOfSectionsInTableView:(UITableView *)tableView {
+    return 1;
+}
+
 @end

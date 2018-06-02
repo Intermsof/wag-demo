@@ -9,6 +9,8 @@
 #ifndef HomeModel_h
 #define HomeModel_h
 
+//Simple home model with only an array of user.
+//Can be expanded as page become more complicated.
 
 @interface HomeModel : NSObject
 - (instancetype)init;

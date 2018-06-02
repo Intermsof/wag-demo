@@ -24,7 +24,7 @@
 };
 
 - (BOOL) hasUsers {
-    return users.count == 0;
+    return users.count != 0;
 }
 
 @end

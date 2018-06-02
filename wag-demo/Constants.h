@@ -17,11 +17,15 @@ extern NSString *USER_CELL_ID;
 extern NSString *API_USER_BEGIN;
 extern NSString *API_USER_END;
 
+//Key for getting the users array
+extern NSString *KEY_FOR_ITEMS;
+
 //Keys for parsing a user
 extern NSString *KEY_FOR_NAME;
 extern NSString *KEY_FOR_BADGES;
 extern NSString *KEY_FOR_STACKOVERFLOW_LINK;
 extern NSString *KEY_FOR_WEBSITE;
+extern NSString *KEY_FOR_LOCATION;
 extern NSString *KEY_FOR_GOLD;
 extern NSString *KEY_FOR_SILVER;
 extern NSString *KEY_FOR_BRONZE;

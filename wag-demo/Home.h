@@ -10,6 +10,9 @@
 
 @interface Home : UIViewController <UITableViewDelegate, UITableViewDataSource>
 
+- (UITableViewCell* )tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath;
+- (NSInteger) tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section;
 
++ (UIColor *) wagColor;
 @end
 

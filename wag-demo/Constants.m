@@ -17,6 +17,8 @@ NSString *USER_CELL_ID = @"userCell";
 NSString *API_USER_BEGIN = @"https://api.stackexchange.com/2.2/users?page=";
 NSString *API_USER_END = @"&site=stackoverflow:";
 
+//Key for getting the users array
+NSString *KEY_FOR_ITEMS = @"items";
 //Keys for parsing a user
 NSString *KEY_FOR_NAME = @"display_name";
 NSString *KEY_FOR_BADGES = @"badge_counts";
@@ -29,3 +31,4 @@ NSString *KEY_FOR_REPUTATION = @"reputation";
 NSString *KEY_FOR_USERID = @"user_id";
 NSString *KEY_FOR_USER_TYPE = @"user_type";
 NSString *KEY_FOR_PROFILE_IMAGE_LINK = @"profile_image";
+NSString *KEY_FOR_LOCATION = @"location";
