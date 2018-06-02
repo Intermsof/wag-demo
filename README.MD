@@ -34,7 +34,7 @@
 ### UserTableCell
 - A custom table cell that programmatically sets up constraints in the constructor for all UILabels and gravatar UIImageView (by calling placeView method).
 - Values for constraint related constants are defined as static variable at the beginning of the file.
-— `- (void) setupWithUser: (User *) user ` takes a user and put all its information inside the UILabels.
+- setupWithUser: (User *) user takes a user and put all its information inside the UILabels.
 - This class has a `+ (NSMutableDictionary *) cellsDisplayed` property. The purpose of this is to keep track of which users are currently being displayed on screen. This is necessary to update the gravatar after the image is successfully downloaded. There are two methods:
 
 ```
