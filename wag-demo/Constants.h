@@ -34,4 +34,11 @@ extern NSString *KEY_FOR_USERID;
 extern NSString *KEY_FOR_USER_TYPE;
 extern NSString *KEY_FOR_PROFILE_IMAGE_LINK;
 
+
+//Relative path from home to the folder containing cached images
+extern NSString *PATH_TO_IMAGES;
+
+//PI
+extern float PI;
+
 #endif /* Constants_h */

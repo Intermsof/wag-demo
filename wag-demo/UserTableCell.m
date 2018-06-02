@@ -9,7 +9,6 @@
 #import <Foundation/Foundation.h>
 #import "UserTableCell.h"
 #import "Constants.h"
-#import "Circle.h"
 #import "Home.h"
 
 //Font sizes for a user table cells
@@ -37,6 +36,7 @@ static int fieldSeparation = 6;
     UILabel *nameLabel;
     UILabel *userTypeLabel;
     UILabel *userLocationLabel;
+    UILabel *userReputationLabel;
     UIImageView *goldImage;
     UILabel *goldAmount;
     UIImageView *silverImage;
@@ -46,10 +46,7 @@ static int fieldSeparation = 6;
     
     //ID of the user this cell is displaying
     NSNumber *uID;
-    
-    //Animated circle to display when loading gravatar
-    __block Circle *circle;
-
+    UIView *loadingAnimation;
 }
 
 @end
@@ -59,7 +56,23 @@ static int fieldSeparation = 6;
 - (instancetype)initWithStyle:(UITableViewCellStyle)style
                  reuseIdentifier:(NSString *)reuseIdentifier{
     self = [super initWithStyle: UITableViewCellStyleDefault reuseIdentifier: USER_CELL_ID];
+    self.selectionStyle = UITableViewCellSelectionStyleNone;
+    for(UIView *subView in self.subviews){
+        [subView removeFromSuperview];
+    }
+    
     [self placeViews];
+    //Add a line to create a small separation between users
+    UIView *line = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
+    line.backgroundColor = [Home.wagColor colorWithAlphaComponent: 0.4];
+    line.translatesAutoresizingMaskIntoConstraints = NO;
+    [self addSubview: line];
+    [line.bottomAnchor constraintEqualToAnchor: self.bottomAnchor].active = true;
+    [line.leftAnchor constraintEqualToAnchor: self.leftAnchor].active = true;
+    [line.rightAnchor constraintEqualToAnchor: self.rightAnchor].active = true;
+    [line.heightAnchor constraintEqualToConstant: 1.0].active = true;
+    [self bringSubviewToFront: line];
+    
     return self;
 }
 
@@ -67,30 +80,41 @@ static int fieldSeparation = 6;
 //This method is only called in the constructor. Use setupwithUser to set up the specific content to display
 - (void) placeViews{
     gravatar = [[UIImageView alloc] init];
-    //Add a circle view to the gravatar and start an animation
-    
-    
     [self addSubview:gravatar];
     gravatar.translatesAutoresizingMaskIntoConstraints = false;
     [gravatar.leftAnchor constraintEqualToAnchor: self.leftAnchor].active = YES;
     [gravatar.heightAnchor constraintEqualToAnchor: self.heightAnchor].active = YES;
     [gravatar.widthAnchor constraintEqualToAnchor: self.heightAnchor].active = YES;
 
-    circle = [[Circle alloc] init];
-    circle.color = [Home wagColor];
-    circle.frame = CGRectMake(0, 0, gravatar.frame.size.width * 2, gravatar.frame.size.width * 2);
-    [gravatar addSubview: circle];
-    [UIView animateWithDuration: 0.5 delay:0 options:UIViewAnimationOptionRepeat | UIViewAnimationOptionAutoreverse animations:^{
-        circle.frame = CGRectMake(0, 0, 0, 0);
+    //Add a loading animation to the gravatar, which will then be removed when image arrives.
+    loadingAnimation = [[UIView alloc] initWithFrame: CGRectMake(0, 0, gravatar.frame.size.width, gravatar.frame.size.height)];
+    loadingAnimation.translatesAutoresizingMaskIntoConstraints = NO;
+    [gravatar  addSubview: loadingAnimation];
+    [gravatar bringSubviewToFront: loadingAnimation];
+    [loadingAnimation.heightAnchor constraintEqualToAnchor: gravatar.heightAnchor ].active = true;
+    [loadingAnimation.widthAnchor constraintEqualToAnchor: gravatar.heightAnchor ].active = true;
+    [loadingAnimation.centerXAnchor constraintEqualToAnchor: gravatar.centerXAnchor].active = true;
+    [loadingAnimation.centerYAnchor constraintEqualToAnchor: gravatar.centerYAnchor].active = true;
+    loadingAnimation.backgroundColor = [Home wagColor];
+    [UIView animateWithDuration: 1.0 delay:0 options:UIViewAnimationOptionRepeat | UIViewAnimationOptionAutoreverse animations:^{
+        CGAffineTransform transform = CGAffineTransformScale(loadingAnimation.transform, 0.1, 0.1);
+        loadingAnimation.transform = CGAffineTransformRotate(transform, PI);
+
+        loadingAnimation.alpha = 0;
     } completion:nil];
-//gravatar.backgroundColor = [UIColor blueColor];
-    
+
+    //User display
     nameLabel = [[UILabel alloc] init];
     [self addSubview: nameLabel];
     nameLabel.translatesAutoresizingMaskIntoConstraints = false;
     [nameLabel setFont:[UIFont boldSystemFontOfSize: nameFontSize]];
     [nameLabel.leftAnchor constraintEqualToAnchor: gravatar.rightAnchor constant: contentPadding].active = YES;
     [nameLabel.topAnchor constraintEqualToAnchor: self.topAnchor constant:contentPadding].active = YES;
+    
+    //Stackoverflow profile and website additional information button
+    
+    
+    
     
     //User type field label
     UILabel *typeText = [[UILabel alloc] init];
@@ -126,12 +150,29 @@ static int fieldSeparation = 6;
     [userLocationLabel.leftAnchor constraintEqualToAnchor: locationText.rightAnchor constant:fieldSeparation].active = YES;
     [userLocationLabel.centerYAnchor constraintEqualToAnchor: locationText.centerYAnchor].active = YES;
     
+    //User Reputation field label
+    UILabel *reputationText = [[UILabel alloc] init];
+    reputationText.text = @"Total Reputation:";
+    reputationText.translatesAutoresizingMaskIntoConstraints = false;
+    [self addSubview:reputationText];
+    [reputationText setFont: [UIFont boldSystemFontOfSize: subInfoFontSize]];
+    [reputationText.leftAnchor constraintEqualToAnchor:gravatar.rightAnchor constant:contentPadding].active = YES;
+    [reputationText.topAnchor constraintEqualToAnchor: locationText.bottomAnchor constant:subInfoSeparation].active = YES;
+    
+    //User location field value
+    userReputationLabel = [[UILabel alloc] init];
+    userReputationLabel.translatesAutoresizingMaskIntoConstraints = false;
+    [self addSubview: userReputationLabel];
+    [userReputationLabel setFont: [UIFont systemFontOfSize:subInfoFontSize]];
+    [userReputationLabel.leftAnchor constraintEqualToAnchor: reputationText.rightAnchor constant:fieldSeparation].active = YES;
+    [userReputationLabel.centerYAnchor constraintEqualToAnchor: reputationText.centerYAnchor].active = YES;
+    
     //badges
     goldImage = [[UIImageView alloc] initWithImage: UserTableCell.goldBadge];
     goldImage.translatesAutoresizingMaskIntoConstraints = false;
     [self addSubview:goldImage];
     [goldImage.leftAnchor constraintEqualToAnchor: gravatar.rightAnchor constant: contentPadding].active = YES;
-    [goldImage.topAnchor constraintEqualToAnchor: userLocationLabel.bottomAnchor constant: subInfoBadgeSeparation].active = YES;
+    [goldImage.topAnchor constraintEqualToAnchor: reputationText.bottomAnchor constant: subInfoBadgeSeparation].active = YES;
     
     goldAmount = [[UILabel alloc] init];
     goldAmount.translatesAutoresizingMaskIntoConstraints = false;
@@ -143,7 +184,7 @@ static int fieldSeparation = 6;
     silverImage.translatesAutoresizingMaskIntoConstraints = false;
     [self addSubview: silverImage];
     [silverImage.leftAnchor constraintEqualToAnchor: goldAmount.rightAnchor constant: badgeSecondSeparation].active = YES;
-    [silverImage.topAnchor constraintEqualToAnchor: userLocationLabel.bottomAnchor constant: subInfoBadgeSeparation].active = YES;
+    [silverImage.topAnchor constraintEqualToAnchor: reputationText.bottomAnchor constant: subInfoBadgeSeparation].active = YES;
     
     silverAmount = [[UILabel alloc] init];
     silverAmount.translatesAutoresizingMaskIntoConstraints = false;
@@ -151,12 +192,11 @@ static int fieldSeparation = 6;
     [silverAmount.leftAnchor constraintEqualToAnchor:silverImage.rightAnchor constant:badgeImageCountSeparation].active = YES;
     [silverAmount.centerYAnchor constraintEqualToAnchor: silverImage.centerYAnchor].active = YES;
     
-    
     bronzeImage = [[UIImageView alloc] initWithImage: UserTableCell.bronzeBadge];
     bronzeImage.translatesAutoresizingMaskIntoConstraints = false;
     [self addSubview: bronzeImage];
     [bronzeImage.leftAnchor constraintEqualToAnchor:silverAmount.rightAnchor constant:badgeSecondSeparation].active = YES;
-    [bronzeImage.topAnchor constraintEqualToAnchor:userLocationLabel.bottomAnchor constant:subInfoBadgeSeparation].active = YES;
+    [bronzeImage.topAnchor constraintEqualToAnchor:reputationText.bottomAnchor constant:subInfoBadgeSeparation].active = YES;
     
     bronzeAmount = [[UILabel alloc] init];
     bronzeAmount.translatesAutoresizingMaskIntoConstraints = false;
@@ -165,23 +205,26 @@ static int fieldSeparation = 6;
     [bronzeAmount.centerYAnchor constraintEqualToAnchor:bronzeImage.centerYAnchor].active = YES;
 }
 
-
+//Called in the UITableDatasource CellforRow function
+//Also called by this Class's setImageForFunction.
 - (void) setupWithUser: (User *) user{
     
     nameLabel.text = user.name;
     userTypeLabel.text = user.userType;
     userLocationLabel.text = user.location == nil? @"Unknown Location" : user.location;
+    userReputationLabel.text = [NSString stringWithFormat:@"%d", user.reputation.intValue];
     goldAmount.text = [NSString stringWithFormat:@"%d",user.gold.intValue];
     silverAmount.text = [NSString stringWithFormat:@"%d",user.silver.intValue];
     bronzeAmount.text = [NSString stringWithFormat:@"%d",user.bronze.intValue];
     uID = user.userID;
     
     if(user.gravatar != nil){
-        NSLog(@"%@", [NSString stringWithFormat:@"%d",user.userID.intValue]);
-       // gravatar.image = user.gravatar;
+        gravatar.image = user.gravatar;
         [gravatar setNeedsDisplay];
         [self setNeedsDisplay];
-       
+        [loadingAnimation.layer removeAllAnimations];
+        [loadingAnimation removeFromSuperview];
+        loadingAnimation = nil;
     }
 }
 

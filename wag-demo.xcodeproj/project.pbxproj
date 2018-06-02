@@ -17,7 +17,6 @@
 		BC3B8CDB20C0DFA5002C9E99 /* Constants.m in Sources */ = {isa = PBXBuildFile; fileRef = BC3B8CDA20C0DFA5002C9E99 /* Constants.m */; };
 		BC3B8CDF20C0E232002C9E99 /* HomeModel.m in Sources */ = {isa = PBXBuildFile; fileRef = BC3B8CDE20C0E232002C9E99 /* HomeModel.m */; };
 		BC3B8CE220C0EA06002C9E99 /* User.m in Sources */ = {isa = PBXBuildFile; fileRef = BC3B8CE120C0EA06002C9E99 /* User.m */; };
-		BC963B8520C226920008F238 /* Circle.m in Sources */ = {isa = PBXBuildFile; fileRef = BC963B8420C226920008F238 /* Circle.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -39,8 +38,6 @@
 		BC3B8CDE20C0E232002C9E99 /* HomeModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HomeModel.m; sourceTree = "<group>"; };
 		BC3B8CE020C0E890002C9E99 /* User.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = User.h; sourceTree = "<group>"; };
 		BC3B8CE120C0EA06002C9E99 /* User.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = User.m; sourceTree = "<group>"; };
-		BC963B8320C226880008F238 /* Circle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Circle.h; sourceTree = "<group>"; };
-		BC963B8420C226920008F238 /* Circle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Circle.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -99,8 +96,6 @@
 			isa = PBXGroup;
 			children = (
 				BC3B8CAF20C0CE29002C9E99 /* Home */,
-				BC963B8320C226880008F238 /* Circle.h */,
-				BC963B8420C226920008F238 /* Circle.m */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -228,7 +223,6 @@
 				BC3B8C9C20C0B3FC002C9E99 /* Home.m in Sources */,
 				BC3B8CDF20C0E232002C9E99 /* HomeModel.m in Sources */,
 				BC3B8CB220C0CEA2002C9E99 /* UserTableCell.m in Sources */,
-				BC963B8520C226920008F238 /* Circle.m in Sources */,
 				BC3B8C9920C0B3FC002C9E99 /* AppDelegate.m in Sources */,
 				BC3B8C9620C0B3FC002C9E99 /* main.m in Sources */,
 			);

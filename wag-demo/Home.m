@@ -25,6 +25,8 @@
 
 //The percentage of the entire height of the screen to use in a cell landscape mode
 static float tableRowHeightPercentage = 0.2;
+//A flag for tracking whether we are loading API. Initialized as true because we start out loading
+static bool isLoading = true;
 
 + (UIColor *) wagColor {
     static UIColor *wag = nil;
@@ -46,18 +48,49 @@ static float tableRowHeightPercentage = 0.2;
     // Dispose of any resources that can be recreated.
 }
 
-//1. set up dataTaskWithURL for shared URLSession to fetch the pageNumber-th page of the stackover flow API for a list of users
-//2. parses the list of json users into instances of the User Class
-//3. Appends the instances to the *end* of the users array in homeModel
-//   Note that a consequence of this is that calling this method twice for the same pageNumber will cause undesireable behavior
-//   The correct way to call this method is to call it with pageNumber = 0, = 1, = 2, = 3, ...
-//4. Calls reloadData on the userTable in the UI Thread
+- (void)getProfileImageForUser: (User *) user {
+    NSURL *homeURL = [NSURL fileURLWithPath: NSHomeDirectory()];
+    NSURL *imageURL = [homeURL URLByAppendingPathComponent: [NSString stringWithFormat: @"%@%d.png",PATH_TO_IMAGES,user.userID.intValue]];
+
+    NSData *savedData = [NSData dataWithContentsOfURL: imageURL];
+    if(savedData != nil){
+        UIImage *image = [[UIImage alloc] initWithData:savedData];
+        user.gravatar = image;
+        [UserTableCell setImageFor: user];
+    }else{
+        NSURL *profileURL = [NSURL URLWithString: user.profileImage];
+        //Start request for profile image
+        [[NSURLSession.sharedSession dataTaskWithURL: profileURL completionHandler: ^
+          (NSData *data, NSURLResponse *response, NSError *error){
+              if(error){
+                  NSLog(@"Could not get profile image for a user");
+              }else{
+                  UIImage *image = [UIImage imageWithData:data];
+                  user.gravatar = image;
+                  
+                  dispatch_async(dispatch_get_main_queue(), ^{
+                      [UserTableCell setImageFor: user];
+                  });
+                  NSData *imageData = UIImagePNGRepresentation(image);
+                  [imageData writeToURL:imageURL atomically:YES];
+              }
+          }] resume];
+    }
+}
+
+/*
+    1. set up dataTaskWithURL for shared URLSession to fetch the pageNumber-th page of the stackover flow API for a list of users
+    2. parses the list of json users into instances of the User Class
+    3. Appends the instances to the *end* of the users array in homeModel
+       Note that a consequence of this is that calling this method twice for the same pageNumber will cause undesireable behavior
+       The correct way to call this method is to call it with pageNumber = 0, = 1, = 2, = 3, ...
+    4. Calls reloadData on the userTable in the UI Thread 
+*/
 - (void)fetchAPIPage: (int) pageNumber {
     
-    NSURL *APIurl = [NSURL URLWithString:@"https://api.stackexchange.com/2.2/users?site=stackoverflow"];
+    NSURL *APIurl = [NSURL URLWithString:[NSString stringWithFormat: @"%@%d%@",API_USER_BEGIN, pageNumber, API_USER_END]];
     [[NSURLSession.sharedSession dataTaskWithURL:APIurl completionHandler: ^
      (NSData *data, NSURLResponse *response, NSError *error){
-         NSLog(@"In completion handler");
          if(error){
              NSLog(@"%@", [NSString stringWithFormat:@"Could not fetch page %d", pageNumber]);
          }else{
@@ -78,29 +111,15 @@ static float tableRowHeightPercentage = 0.2;
                                               reputation:[unparsedUser objectForKey: KEY_FOR_REPUTATION]
                                                   userID:[unparsedUser objectForKey: KEY_FOR_USERID]];
                  
-                 NSURL *profileURL = [NSURL URLWithString: user.profileImage];
-                 //Start request for profile image
-                 [[NSURLSession.sharedSession dataTaskWithURL: profileURL completionHandler: ^
-                   (NSData *data, NSURLResponse *response, NSError *error){
-                       if(error){
-                           NSLog(@"Could not get profile image for a user");
-                       }else{
-                           UIImage *image = [UIImage imageWithData:data];
-                           user.gravatar = image;
-                        
-                           dispatch_async(dispatch_get_main_queue(), ^{
-                               [UserTableCell setImageFor: user];
-                           });
-                       }
-                   }] resume];
                  
+                 [self getProfileImageForUser: user];
                  
                  [homeModel.users addObject: user];
              }
              
              dispatch_async(dispatch_get_main_queue(), ^{
                  [usersTable reloadData];
-                 NSLog(@"reloaded data");
+                 isLoading = false;
              });
          }
      }] resume];
@@ -108,6 +127,7 @@ static float tableRowHeightPercentage = 0.2;
 }
 
 - (void) viewWillAppear:(BOOL)animated {
+    isLoading = true;
     homeModel = [[HomeModel alloc] init];
     //Add a colored background for status bar
     UIView *statusBar = [[UIView alloc] initWithFrame: CGRectMake(0, 0, self.view.frame.size.width, 20)];
@@ -120,6 +140,7 @@ static float tableRowHeightPercentage = 0.2;
     [usersTable registerClass: [UserTableCell class] forCellReuseIdentifier: USER_CELL_ID];
     usersTable.delegate = self;
     usersTable.dataSource = self;
+    
     [self.view addSubview: usersTable];
     
     usersTable.backgroundColor = Home.wagColor;
@@ -131,30 +152,55 @@ static float tableRowHeightPercentage = 0.2;
     
     [self fetchAPIPage:1];
     
-    
-    
 }
+
+- (void) scrollViewDidScroll:(UIScrollView *)scrollView {
+    static CGFloat threshold = 200.0;
+    static int lastPageLoaded = 1;
+    CGFloat contentOffset = scrollView.contentOffset.y;
+    CGFloat maximumOffset = scrollView.contentSize.height - scrollView.frame.size.height;
+    
+    if (!isLoading && (maximumOffset - contentOffset <= threshold)){
+        isLoading = true;
+        lastPageLoaded++;
+        NSLog(@"In here %d", lastPageLoaded);
+        [self fetchAPIPage: lastPageLoaded];
+     }
+}
+
 
 //Tableview functions
 
 - (CGFloat)tableView:(UITableView *)tableView
 heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return tableRowHeightPercentage * tableView.frame.size.height;
+    if(indexPath.row < homeModel.users.count){
+        return tableRowHeightPercentage * tableView.frame.size.height;
+    }else{
+        return 0.1 * tableView.frame.size.height;
+    }
+    
 }
 
 - (UITableViewCell*) tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UserTableCell *result = [tableView dequeueReusableCellWithIdentifier: USER_CELL_ID forIndexPath:indexPath];
-
-    if([homeModel hasUsers]){
+    
+    if(indexPath.row < homeModel.users.count){
+        UserTableCell *result = [tableView dequeueReusableCellWithIdentifier: USER_CELL_ID forIndexPath:indexPath];
         User *user = homeModel.users[indexPath.row];
         [UserTableCell notifyDisplayed:user.userID cell:result];
         [result setupWithUser: user];
+        return result;
+    }else{
+        UITableViewCell *result = [[UITableViewCell alloc] init];
+        result.backgroundColor = [UIColor grayColor];
+        return result;
     }
-    return result;
 }
 
 
 - (NSInteger) tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    if(isLoading){
+        return homeModel.users.count + 1;
+    }
     return homeModel.users.count;
 }
 

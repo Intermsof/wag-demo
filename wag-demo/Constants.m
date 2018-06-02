@@ -13,9 +13,9 @@
 NSString *USER_CELL_ID = @"userCell";
 
 //The URL for the stackoverflow api broken into two parts
-//Make a complete URL using [NSString stringWithFormat: @"%@%d%@",APIUSERBEGIN, pageNumber, APIUSEREND]
+//Make a complete URL using [NSString stringWithFormat: @"%@%d%@",API_USER_BEGIN, pageNumber, API_USER_END]
 NSString *API_USER_BEGIN = @"https://api.stackexchange.com/2.2/users?page=";
-NSString *API_USER_END = @"&site=stackoverflow:";
+NSString *API_USER_END = @"&site=stackoverflow";
 
 //Key for getting the users array
 NSString *KEY_FOR_ITEMS = @"items";
@@ -32,3 +32,9 @@ NSString *KEY_FOR_USERID = @"user_id";
 NSString *KEY_FOR_USER_TYPE = @"user_type";
 NSString *KEY_FOR_PROFILE_IMAGE_LINK = @"profile_image";
 NSString *KEY_FOR_LOCATION = @"location";
+
+//Relative path from home to the folder containing cached images
+NSString *PATH_TO_IMAGES = @"/Library/Caches/";
+
+//PI
+float PI = 3.14159;
