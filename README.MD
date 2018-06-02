@@ -4,7 +4,7 @@
 
 - Language: Objective-C
 - iOS10
-- Developed in xCode 8.2.1. Tested to be functional in xCode 11.3
+- Developed in xCode 8.2.1. Tested to be functional in xCode ‌9.3.1
 - Tested on iPhone 6, 6s, 7, 7s, iPad Pro simulators. iPhone 5 is not supported (Table rows overflow slightly).
 
 ## Functions implemented
