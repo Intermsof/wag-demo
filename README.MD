@@ -29,7 +29,7 @@
 - (void)getProfileImageForUser: (User *) user
 ```
 - This class also contains delegate and datasource methods for the table displayed.
-- There is a <span style=“text-color:#24b88e”>wagColor</span> property defined in this class meant to be used across the app;
+- There is a <b style=“color:#24b88e”>wagColor</b> property defined in this class meant to be used across the app;
 
 ### UserTableCell
 - A custom table cell that programmatically sets up constraints in the constructor for all UILabels and gravatar UIImageView (by calling placeView method).
