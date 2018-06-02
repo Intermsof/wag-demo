@@ -78,6 +78,7 @@ static int fieldSeparation = 6;
 
 //This method creates the required views and setups up their constraints.
 //This method is only called in the constructor. Use setupwithUser to set up the specific content to display
+//Reading this method is not necessary
 - (void) placeViews{
     gravatar = [[UIImageView alloc] init];
     [self addSubview:gravatar];
@@ -112,8 +113,6 @@ static int fieldSeparation = 6;
     [nameLabel.topAnchor constraintEqualToAnchor: self.topAnchor constant:contentPadding].active = YES;
     
     //Stackoverflow profile and website additional information button
-    
-    
     
     
     //User type field label
@@ -254,6 +253,9 @@ static int fieldSeparation = 6;
         [UserTableCell.cellsDisplayed removeObjectForKey: uID];
     }
 }
+
+//This method is called in the tableviewdatasource cellforRow method to notify that a new
+//user appears on the screen.
 + (void) notifyDisplayed : (NSNumber *) userID
                     cell : (UserTableCell *) cell{
     [UserTableCell.cellsDisplayed setObject:cell forKey:userID];

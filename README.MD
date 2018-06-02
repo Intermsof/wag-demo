@@ -9,7 +9,7 @@
 
 ## Functions implemented
 
-- Connects to Stackoverflow API and retrieves first page of data. Scrolling all the way down the table will retrieve more pages of data.
+- Connects to Stackoverflow API and retrieves first page of data. Scrolling all the way down the table will **retrieve more pages** of data.
 - Gravatar, username, badges, location, user type, reputation is displayed.
 - Before downloading gravatar, a check is made to see if the file /Library/Caches/{userid}.png exists. If it does, the app loads from file instead of downloading the image.
 - Upon downloading gravatar, it is saved to /Library/Caches/{userid}.png
@@ -18,7 +18,7 @@
 
 ## Architecture
 
-- This application follows the standard MVC architecture. There are top level folders named Models, Views, Controllers. Within each, there is a folder for each page in the app that stores files relevant only to that page (only one in this case, called “Home”). Files that are used in multiple pages reside directly in Models, Views, Controllers.
+- This application follows the standard <b>MVC architecture</b>. There are top level folders named Models, Views, Controllers. Within each, there is a folder for each page in the app that stores files relevant only to that page (only one in this case, called “Home”). Files that are used in multiple pages reside directly in Models, Views, Controllers.
 
 ## Class Overview 
 
@@ -29,23 +29,23 @@
 - (void)getProfileImageForUser: (User *) user
 ```
 - This class also contains delegate and datasource methods for the table displayed.
-- There is a wagColor property defined in this class meant to be used across the app;
+- There is a <span style=“text-color:#24b88e”>wagColor</span> property defined in this class meant to be used across the app;
 
 ### UserTableCell
 - A custom table cell that programmatically sets up constraints in the constructor for all UILabels and gravatar UIImageView (by calling placeView method).
 - Values for constraint related constants are defined as static variable at the beginning of the file.
-— ``` - (void) setupWithUser: (User *) user ``` takes a user and put all its information inside the UILabels.
-- This class has a ```+ (NSMutableDictionary *) cellsDisplayed``` property. The purpose of this is to keep track of which users are currently being displayed on screen. This is necessary to update the gravatar after the image is successfully downloaded. There are two methods:
+— `- (void) setupWithUser: (User *) user ` takes a user and put all its information inside the UILabels.
+- This class has a `+ (NSMutableDictionary *) cellsDisplayed` property. The purpose of this is to keep track of which users are currently being displayed on screen. This is necessary to update the gravatar after the image is successfully downloaded. There are two methods:
 
 ```
 - (void) prepareForReuse
 + (void) notifyDisplayed : (NSNumber *) userID
                     cell : (UserTableCell *) cell
 ```
-that maintains this dictionary. The first erases the user from the dictionary, the second adds the key value pair into the dictionary.
+that maintains this dictionary. The first erases a user from the dictionary, the second adds the key value pair into the dictionary.
 
-###User
+### User
 - A simple user object
 
-###HomeModel
+### HomeModel
 - A model that is meant to contain everything needed by the Home controller to display its views. Only contains a list of users for now.

@@ -48,6 +48,11 @@ static bool isLoading = true;
     // Dispose of any resources that can be recreated.
 }
 
+/*
+ A method that first checks the file system in "/library/caches/{userid}.png" for the user's gravatar.
+ If unsuccessful, fetches the image over the network. Once the image arrives, it saves the data to
+ the mentioned path, and updates the cells to display this image.
+ */
 - (void)getProfileImageForUser: (User *) user {
     NSURL *homeURL = [NSURL fileURLWithPath: NSHomeDirectory()];
     NSURL *imageURL = [homeURL URLByAppendingPathComponent: [NSString stringWithFormat: @"%@%d.png",PATH_TO_IMAGES,user.userID.intValue]];
@@ -154,6 +159,8 @@ static bool isLoading = true;
     
 }
 
+
+//An implementation to add more pages to the end of the table when scrolled to the end
 - (void) scrollViewDidScroll:(UIScrollView *)scrollView {
     static CGFloat threshold = 200.0;
     static int lastPageLoaded = 1;
@@ -170,7 +177,6 @@ static bool isLoading = true;
 
 
 //Tableview functions
-
 - (CGFloat)tableView:(UITableView *)tableView
 heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     if(indexPath.row < homeModel.users.count){
